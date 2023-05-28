@@ -1,5 +1,4 @@
 import {
-  Divider,
   Form,
   Radio,
   Image,
@@ -11,10 +10,32 @@ import {
 import type1 from '../images/type1.png';
 import type2 from '../images/type2.png';
 import type3 from '../images/type3.png';
-import layout from '../images/layout.png';
-import calc from '../images/calc.png';
 import spead from '../images/spead.png';
 import result from '../images/result.png';
+import hsr_a from '../images/hsr_a.png';
+import shs_v from '../images/shs_v.png';
+import logo from '../images/logo.jpg';
+
+import i11 from '../images/11.png';
+import i12 from '../images/12.png';
+import i13 from '../images/13.png';
+import i14 from '../images/14.png';
+import i21 from '../images/21.png';
+import i22 from '../images/22.png';
+import i23 from '../images/23.png';
+import i24 from '../images/24.png';
+
+
+const iimgs:any = {
+    i11,
+    i12,
+    i13,
+    i14,
+    i21,
+    i22,
+    i23,
+    i24,
+}
 
 import DemoBlock from './DemoBlock';
 import styles from './index.less';
@@ -23,9 +44,8 @@ import { useState } from 'react';
 import calculate from './calculate';
 
 const imgs: any = {
-    hsr_a: 'https://tcs.thk.com/images/lm/kataban/hsr_a.png',
-    hsr_r: '//tcs.thk.com/images/lm/kataban/hsr_r.png',
-    shs_v: '//tcs.thk.com/images/lm/kataban/shs_v.png'
+    'W': hsr_a ,
+    'H': shs_v 
 };
 const sizes: any = {
     15: 23,
@@ -40,7 +60,7 @@ export default function IndexPage() {
   };
   return (
     <div>
-      <h1 className={styles.title}>直线导轨选型与寿命预测</h1>
+      <h1 className={styles.title}>线轨选型与寿命预测</h1>
       {!state && (
         <Form
           onFinish={onFinish}
@@ -101,7 +121,12 @@ export default function IndexPage() {
                   </Radio.Group>
                 </Form.Item>
               </div>
-              <Image width={300} src={layout} />
+              <Form.Item dependencies={['rn', 'bn']}>
+                {({ getFieldsValue }) => {
+                  const { rn = 1, bn = 1 } = getFieldsValue();
+                  return <Image width={200} src={iimgs['i' + rn + bn]} />;
+                }}
+              </Form.Item>
             </Space>
           </DemoBlock>
           <DemoBlock title="型号选择">
@@ -110,8 +135,8 @@ export default function IndexPage() {
                 <Form.Item name="Katashiki" label="请选择类型。" >
                   <Radio.Group defaultValue="SRS">
                     <Space>
-                      <Radio value="SRS">滚珠</Radio>
-                      <Radio value="RSR">滚柱</Radio>
+                      <Radio value="RG">滚珠</Radio>
+                      <Radio value="HG">滚柱</Radio>
                     </Space>
                   </Radio.Group>
                 </Form.Item>
@@ -119,10 +144,9 @@ export default function IndexPage() {
                   dependencies={['Katashiki']}
                   noStyle
                 >
-               
                   {({ getFieldsValue }) => {
                     const { Katashiki } = getFieldsValue();
-                    if (Katashiki === 'RSR')
+                    if (Katashiki === 'HG')
                       return (
                         <Form.Item
                         name="Size"
@@ -155,9 +179,8 @@ export default function IndexPage() {
                 <Form.Item name="BlockType" label="请选择滑块类型。">
                   <Radio.Group>
                     <Space direction='vertical'>
-                      <Radio value="hsr_a">法兰</Radio>
-                      <Radio value="hsr_r">加高</Radio>
-                      <Radio value="shs_v">标准</Radio>
+                      <Radio value="W">法兰</Radio>
+                      <Radio value="H">标准</Radio>
                     </Space>
                   </Radio.Group>
                 </Form.Item>
@@ -171,12 +194,12 @@ export default function IndexPage() {
             </Space>
           </DemoBlock>
           <DemoBlock title="载重条件输入">
-            <Image width={300} src={calc} />
-            <Form.Item dependencies={['Size']}>
-                {({ getFieldsValue }) => {
-                  const { Size } = getFieldsValue();
-                  return  <Form.Item name="LM_Calc_m" label="载重 (m1) kg">
-                  <Input type="number" placeholder={sizes[Size]} />
+            <Form.Item dependencies={['Size', 'rn', 'bn']}>
+                {({ getFieldsValue, setFieldsValue }) => {
+                  const { Size, rn, bn } = getFieldsValue();
+                  setFieldsValue({LM_Calc_m: sizes[Size]*rn*bn })
+                  return  <Form.Item name="LM_Calc_m" label="载重 (m1) kg" >
+                  <Input type="number"  defaultValue={sizes[Size]*rn*bn + ''}/>
                 </Form.Item>
                 }}
               </Form.Item>
@@ -341,11 +364,22 @@ export default function IndexPage() {
               保存结果
             </Button>
             <Button color="primary" fill="outline">
-              保存为CAD
+              下载CAD图纸
+            </Button>
+             <Button color="primary" fill="none" onClick={() => setState(undefined)}>
+              返回
             </Button>
           </Space>
         </div>
       )}
+      <Image  width={100} src={logo}  className={styles.logo}/>
     </div>
   );
 }
+
+
+// git init
+// git remote add origin https://github.com/hellsing222/hellsing222.github.io.git
+// git add .
+// git commit -m "feat: v1"   
+// ggpush -f 
